@@ -80,3 +80,4 @@ lint/tmp/
 
 app/src/main/assets/app.zip
 signings.gradle
+app/src/main/res/.DS_Store

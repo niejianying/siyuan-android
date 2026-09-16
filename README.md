@@ -2,20 +2,26 @@
 
 ## Overview
 
-* Please go to [SiYuan issues](https://github.com/siyuan-note/siyuan/issues) to report issues/consult discussions
-* Code contributions are welcome
+* NieJianYing Android shell (fork of [siyuan-android](https://github.com/siyuan-note/siyuan-android))
+* `applicationId`: `cn.niejianying.niejianying` (debug suffix `.debug`)
+* Daily / release workflow: see [`niejianying/siyuan` docs/ANDROID-RELEASE.md](https://github.com/niejianying/siyuan/blob/master/docs/ANDROID-RELEASE.md)
 
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80">](https://f-droid.org/packages/org.b3log.siyuan/)
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" alt="Get it on Google Play" height="80">](https://play.google.com/store/apps/details?id=org.b3log.siyuan)
+## Daily development (recommended)
 
-## Construction guide
+From the sibling `siyuan` repo (do not go through Flutter):
 
-1. Refer to [SiYuan Development Guide](https://github.com/siyuan-note/siyuan/blob/master/.github/CONTRIBUTING.md) to compile the kernel
-2. Copy the resource files and package it in app/src/main/assets/app.zip
-   * appearance
-   * guide
-   * stage
-   * changelogs
+```bash
+cd ../siyuan
+node scripts/android-dev-run.mjs --flavor=official
+```
+
+Builds desktop UI, packs a trimmed `app.zip`, gomobile `kernel.aar`, writes into this repo, then installs the debug APK.
+
+## Manual setup
+
+1. Follow the [SiYuan Development Guide](https://github.com/siyuan-note/siyuan/blob/master/.github/CONTRIBUTING.md) to build the kernel, or use the one-shot script above
+2. Use `siyuan/scripts/package-android-app-zip.sh` to produce trimmed `app/src/main/assets/app.zip`
+   * appearance / guide / stage / changelogs (covers, LXGW, extra langs excluded)
 
 Directory structure reference:
 
@@ -39,21 +45,22 @@ When building using the command line console, you not only need to modify the `s
    ```shell
    # windows
    .\gradlew clean buildReleaseTask
-   # linux
-   gradle clean buildReleaseTask
-   ```
    
+   # linux / macOS
+   ./gradlew clean buildReleaseTask
+   ```
+
    The naming convention is as follows:
 
    ```txt
    assemble/bundle  Googleplay  Debug/Release
    ```
-   
+
    `assemble` generates APKs
    `bundle` generates AABs
    `Googleplay` is the name of the channel package; refer to the `productFlavors {}` configuration in flavors.gradle for the specified location
    `Debug/Release` stands for Test version/Official version
 4. After the execution is complete, you can find the generated program at the following location
    ```txt
-   siyuan-android\app\build-release\siyuan-${versionName}-all
+   siyuan-android/app/build-release/siyuan-${versionName}-all
    ```
