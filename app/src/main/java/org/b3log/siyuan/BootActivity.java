@@ -182,6 +182,6 @@ public class BootActivity extends AppCompatActivity {
         agreementDialog = ab.show();
     }
 
-    private final String agreement = "请您充分阅读并理解<a href=\"https://b3log.org/siyuan/eula.html\" target=\"_blank=\">《用户协议》</a>和" +
-            "<a href=\"https://b3log.org/siyuan/privacy.html\" target=\"_blank\">《隐私政策》</a>。";
+    private final String agreement = "请您充分阅读并理解<a href=\"https://niejianying.cn/user-agreement\" target=\"_blank\">《用户协议》</a>和" +
+            "<a href=\"https://niejianying.cn/privacy-policy\" target=\"_blank\">《隐私政策》</a>。";
 }
