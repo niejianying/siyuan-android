@@ -23,25 +23,25 @@ android {
     // 小米/Vivo/OPPO/荣耀
     cn profileLqr() >> {
       buildConfigField "String", "CHANNEL", '"cn"'
-      resValue "string", "app_name", "思源笔记"
+      resValue "string", "app_name", "捏见影"
     }
 
     // Google Play
     googleplay profileLqr() >> {
       buildConfigField "String", "CHANNEL", '"googleplay"'
-      resValue "string", "app_name", "SiYuan"
+      resValue "string", "app_name", "NieJianYing"
     }
 
     // 华为
     huawei profileLqr() >> {
       buildConfigField "String", "CHANNEL", '"huawei"'
-      resValue "string", "app_name", "思源笔记"
+      resValue "string", "app_name", "捏见影"
     }
 
     // 官方
     official profileLqr() >> {
       buildConfigField "String", "CHANNEL", '"official"'
-      resValue "string", "app_name", "SiYuan"
+      resValue "string", "app_name", "NieJianYing"
     }
 
     // 遍历 productFlavors 多渠道，设置渠道号

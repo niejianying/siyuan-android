@@ -96,6 +96,8 @@
 
                 <!-- Android 会在未声明 host 时忽略 path，因此统一接收 siyuan: 链接并在代码中精确分派。 -->
                 <data android:scheme="siyuan" />
+                <!-- 品牌重命名后新增 niejianying:// 深链（保留 siyuan:// 兼容上游链接） -->
+                <data android:scheme="niejianying" />
             </intent-filter>
         </activity>
 
