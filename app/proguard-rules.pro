@@ -27,3 +27,11 @@
 -dontwarn org.bouncycastle.**
 -dontwarn org.conscrypt.**
 -dontwarn org.openjsse.**
+
+# 支付宝 SDK 混淆规则（com.ut.device / utdid 需保留，混淆会导致收银台闪退）
+-keep class com.alipay.** { *; }
+-keep class com.ut.** { *; }
+-keep class com.ta.utdid2.** { *; }
+-dontwarn com.alipay.**
+-dontwarn com.ut.**
+-dontwarn com.ta.utdid2.**

@@ -53,6 +53,12 @@
     <!-- 预约通知 -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
+    <!-- 支付宝 App 支付：包可见性（Android 11+ 显式包 Intent/查询安装状态） -->
+    <queries>
+        <package android:name="com.eg.android.AlipayGphone" />
+        <package android:name="com.eg.android.AlipayGphoneRC" />
+    </queries>
+
     <application
         android:name=".App"
         android:enableOnBackInvokedCallback="true"

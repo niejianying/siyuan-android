@@ -55,6 +55,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.ShareCompat;
 import androidx.core.content.FileProvider;
 
+import com.alipay.sdk.app.PayTask;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.KeyboardUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -69,6 +70,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.Map;
 
 import mobile.Mobile;
 
@@ -839,5 +841,64 @@ public final class JSAndroid {
             Utils.logError("js", "parse color [" + str + "] failed", e);
             return Color.parseColor("#212224");
         }
+    }
+
+    @JavascriptInterface
+    public boolean isAlipayInstalled() {
+        // 正式版或沙箱版支付宝任一安装即视为可用（沙箱仅联调使用）
+        return isPackageInstalled("com.eg.android.AlipayGphone")
+                || isPackageInstalled("com.eg.android.AlipayGphoneRC");
+    }
+
+    @JavascriptInterface
+    public void payAlipay(final String orderStr) {
+        // 支付宝 App 支付（alipay_app）：收银台在独立线程执行，完成后经 window.handlePayResult 回传 Web。
+        if (StringUtils.isEmpty(orderStr)) {
+            Utils.logError("JSAndroid", "payAlipay failed: empty order string");
+            return;
+        }
+        if (null == activity || activity.isFinishing()) {
+            Utils.logError("JSAndroid", "payAlipay failed: activity is not available");
+            return;
+        }
+        new Thread(() -> {
+            try {
+                final PayTask payTask = new PayTask(activity);
+                final Map<String, String> result = payTask.payV2(orderStr, true);
+                notifyPayResult(result);
+            } catch (final Exception e) {
+                Utils.logError("JSAndroid", "payAlipay failed", e);
+            }
+        }).start();
+    }
+
+    private boolean isPackageInstalled(final String packageName) {
+        try {
+            activity.getPackageManager().getPackageInfo(packageName, 0);
+            return true;
+        } catch (final PackageManager.NameNotFoundException e) {
+            return false;
+        }
+    }
+
+    private void notifyPayResult(final Map<String, String> result) {
+        if (null == activity || activity.isFinishing() || null == activity.webView) {
+            Utils.logError("JSAndroid", "notifyPayResult failed: webview is not available");
+            return;
+        }
+        final String resultStatus = result.get("resultStatus");
+        final String memo = result.get("memo");
+        final String rawResult = result.get("result");
+        final String script = "window.handlePayResult && window.handlePayResult("
+                + JSONObject.quote(StringUtils.isEmpty(resultStatus) ? "" : resultStatus) + ","
+                + JSONObject.quote(StringUtils.isEmpty(memo) ? "" : memo) + ","
+                + JSONObject.quote(StringUtils.isEmpty(rawResult) ? "" : rawResult) + ");";
+        activity.runOnUiThread(() -> {
+            try {
+                activity.webView.evaluateJavascript(script, null);
+            } catch (final Exception e) {
+                Utils.logError("JSAndroid", "notifyPayResult failed", e);
+            }
+        });
     }
 }
