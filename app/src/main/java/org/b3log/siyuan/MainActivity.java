@@ -164,6 +164,9 @@ public class MainActivity extends AppCompatActivity implements com.blankj.utilco
                     uris.isEmpty() ? null : uris.toArray(new Uri[0])));
     private final ActivityResultLauncher<String> recordAudioPermissionLauncher = registerForActivityResult(
             new RequestPermission(), this::onRecordAudioPermissionResult);
+    private final ActivityResultLauncher<String[]> webDavMediaPermissionLauncher = registerForActivityResult(
+            new androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions(),
+            this::onWebDavMediaPermissionResult);
     private final ActivityResultLauncher<Intent> saveExportFileLauncher = registerForActivityResult(
             new StartActivityForResult(), result -> {
                 if (null != jsAndroid) {
@@ -619,6 +622,11 @@ public class MainActivity extends AppCompatActivity implements com.blankj.utilco
 
         jsAndroid = new JSAndroid(this);
         webView.addJavascriptInterface(jsAndroid, "JSAndroid");
+        // 上次开启 WebDAV 且相册权限已授予时自动启动；权限未授予则保持停止，
+        // 等到用户在面板里点启用再走 startWebDavWithPermission 申请权限。
+        if (org.b3log.siyuan.webdav.WebDavManager.isEnabledPref() && isMediaPermissionGranted()) {
+            org.b3log.siyuan.webdav.WebDavManager.restoreIfEnabled();
+        }
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
         final WebSettings ws = webView.getSettings();
         ws.setJavaScriptEnabled(true);
@@ -933,6 +941,71 @@ public class MainActivity extends AppCompatActivity implements com.blankj.utilco
             Utils.showToast(this, getString(R.string.microphone_permission_denied));
         } else {
             showMicrophonePermissionSettings();
+        }
+    }
+
+    /**
+     * 由 JSAndroid 桥调起：检查相册权限，已授予则直接启动服务，
+     * 否则发起系统权限申请，授权回调后自动启动。
+     */
+    public void startWebDavWithPermission() {
+        if (isMediaPermissionGranted()) {
+            org.b3log.siyuan.webdav.WebDavManager.start();
+            return;
+        }
+        final String[] perms = requiredMediaPermissions();
+        if (perms.length == 0) {
+            org.b3log.siyuan.webdav.WebDavManager.start();
+            return;
+        }
+        try {
+            webDavMediaPermissionLauncher.launch(perms);
+        } catch (final Exception e) {
+            Utils.logError("webdav", "request media permission failed", e);
+        }
+    }
+
+    /**
+     * 检查相册读取权限是否已授予（区分 SDK）。
+     */
+    public boolean isMediaPermissionGranted() {
+        for (final String perm : requiredMediaPermissions()) {
+            if (ContextCompat.checkSelfPermission(this, perm) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 按 SDK 返回相册读取权限集合。Android 13+ 用 READ_MEDIA_*；
+     * 低版本用 READ_EXTERNAL_STORAGE。
+     */
+    private String[] requiredMediaPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return new String[]{
+                    "android.permission.READ_MEDIA_IMAGES",
+                    "android.permission.READ_MEDIA_VIDEO"
+            };
+        }
+        return new String[]{"android.permission.READ_EXTERNAL_STORAGE"};
+    }
+
+    private void onWebDavMediaPermissionResult(final java.util.Map<String, Boolean> result) {
+        if (result == null) {
+            return;
+        }
+        boolean allGranted = true;
+        for (final String perm : requiredMediaPermissions()) {
+            final Boolean granted = result.get(perm);
+            if (granted == null || !granted) {
+                allGranted = false;
+            }
+        }
+        if (allGranted) {
+            org.b3log.siyuan.webdav.WebDavManager.start();
+        } else {
+            Utils.showToast(this, getString(R.string.webdav_photos_permission_denied));
         }
     }
 
@@ -1418,6 +1491,7 @@ public class MainActivity extends AppCompatActivity implements com.blankj.utilco
             microphonePermissionDialog.dismiss();
             microphonePermissionDialog = null;
         }
+        org.b3log.siyuan.webdav.WebDavManager.shutdown();
         super.onDestroy();
         exit();
     }

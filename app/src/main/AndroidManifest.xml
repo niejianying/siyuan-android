@@ -47,6 +47,13 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
+    <!-- 局域网相册 WebDAV：读取系统相册以挂载为只读 WebDAV -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
     <!-- 添加桌面快捷方式 -->
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
 
@@ -128,7 +135,7 @@
             android:name=".ShortcutActivity"
             android:exported="true"
             android:launchMode="singleTask"
-            android:taskAffinity="org.b3log.siyuan.shorthand"
+            android:taskAffinity="${applicationId}.shorthand"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -215,7 +222,7 @@
         -->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="@string/app_package_name"
+            android:authorities="${applicationId}"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"

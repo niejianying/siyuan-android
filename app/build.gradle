@@ -26,8 +26,11 @@ android {
     namespace 'org.b3log.siyuan'
     compileSdk = 36
 
-    // 2. 配置 APK 输出文件名
+    // 2. 配置 APK 输出文件名；FileProvider / shortcuts 的 package 跟 applicationId
     applicationVariants.configureEach { variant ->
+        // 避免与官方 org.b3log.siyuan 抢 ContentProvider authorities
+        variant.resValue "string", "app_package_name", variant.applicationId
+
         variant.outputs.configureEach { output ->
             def buildType = variant.buildType.name
             def flavorName = variant.flavorName
@@ -49,6 +52,8 @@ android {
         targetSdk = 36
         versionCode siyuanVersionCode
         versionName siyuanVersionName
+        // shortcuts.xml 等占位；最终由 applicationVariants 按 applicationId 覆盖
+        resValue "string", "app_package_name", "cn.niejianying.niejianying"
     }
 
     buildFeatures {
@@ -65,7 +70,7 @@ android {
 
             // 此处优先级太高，渠道处配置 resValue 不会生效，故放到了 productFlavors 多渠道打包处处理
             // resValue "string", "app_name", "SiYuan"
-            resValue "string", "app_package_name", "org.b3log.siyuan"
+            // app_package_name 由 applicationVariants 写成 applicationId（勿写死 org.b3log.siyuan）
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -75,7 +80,6 @@ android {
             minifyEnabled false
 
             resValue "string", "app_name", "NieJianYing-Debug"
-            resValue "string", "app_package_name", "org.b3log.siyuan.debug"
 
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

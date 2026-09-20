@@ -15,27 +15,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package org.b3log.siyuan;
+package org.b3log.siyuan.webdav;
 
-import android.app.Application;
-
-import com.blankj.utilcode.util.Utils;
-
-import org.b3log.siyuan.webdav.WebDavManager;
+import java.io.InputStream;
 
 /**
- * SiYuan Application.
- *
- * @author <a href="https://88250.b3log.org">Liang Ding</a>
- * @version 1.0.0.0, Feb 23, 2022
- * @since 1.0.0
+ * 可读媒体流结果，供 GET/HEAD 使用。
  */
-public class App extends Application {
+public final class WebDavReadResult {
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        Utils.init(this);
-        WebDavManager.initialize(this);
+    public final InputStream stream;
+    public final long length;
+    public final String mimeType;
+    public final long lastModifiedMillis;
+    public final String etag;
+
+    public WebDavReadResult(final InputStream stream, final long length, final String mimeType,
+                            final long lastModifiedMillis, final String etag) {
+        this.stream = stream;
+        this.length = length;
+        this.mimeType = mimeType;
+        this.lastModifiedMillis = lastModifiedMillis;
+        this.etag = etag;
     }
 }

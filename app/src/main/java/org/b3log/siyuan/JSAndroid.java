@@ -61,6 +61,7 @@ import com.blankj.utilcode.util.KeyboardUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.zackratos.ultimatebarx.ultimatebarx.java.UltimateBarX;
 
+import org.b3log.siyuan.webdav.WebDavManager;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -841,6 +842,31 @@ public final class JSAndroid {
             Utils.logError("js", "parse color [" + str + "] failed", e);
             return Color.parseColor("#212224");
         }
+    }
+
+    @JavascriptInterface
+    public void startWebDav() {
+        activity.runOnUiThread(() -> activity.startWebDavWithPermission());
+    }
+
+    @JavascriptInterface
+    public void stopWebDav() {
+        activity.runOnUiThread(() -> {
+            WebDavManager.stop();
+        });
+    }
+
+    @JavascriptInterface
+    public String getWebDavStatus() {
+        final JSONObject payload = new JSONObject();
+        try {
+            payload.put("webDav", WebDavManager.statusJson());
+            payload.put("permissionGranted", activity.isMediaPermissionGranted());
+        } catch (final Exception e) {
+            return "{\"webDav\":\"{\\\"status\\\":\\\"error\\\",\\\"message\\\":\\\""
+                    + e.getClass().getSimpleName() + "\\\"}\",\"permissionGranted\":false}";
+        }
+        return payload.toString();
     }
 
     @JavascriptInterface
