@@ -1144,7 +1144,8 @@ public class MainActivity extends AppCompatActivity implements com.blankj.utilco
 
         try {
             new Thread(() -> {
-                if (Utils.isHuaweiChannel(this.getPackageManager())) {
+                final String channel = Utils.getChannel(this.getPackageManager());
+                if ("cn".equals(channel) || "huawei".equals(channel)) {
                     Mobile.disableFeature("ai");
                 }
 
