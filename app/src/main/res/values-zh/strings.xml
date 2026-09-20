@@ -13,4 +13,5 @@
     <string name="microphone_permission_denied">麦克风权限已被拒绝</string>
     <string name="microphone_permission_settings">麦克风权限已被禁用，请在应用设置中启用</string>
     <string name="open_settings">打开设置</string>
+    <string name="webdav_photos_permission_denied">相册权限已被拒绝，请在系统设置中允许后启用 WebDAV</string>
 </resources>

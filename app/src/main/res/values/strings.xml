@@ -13,4 +13,5 @@
     <string name="microphone_permission_denied">Microphone permission was denied</string>
     <string name="microphone_permission_settings">Microphone permission is disabled. Open app settings to enable it</string>
     <string name="open_settings">Open settings</string>
+    <string name="webdav_photos_permission_denied">Photo library access was denied. Allow it in system settings to enable WebDAV</string>
 </resources>
